@@ -1,0 +1,28 @@
+import { Schema, models, model } from 'mongoose';
+
+export interface TransactionType extends Document {
+    createdAt?: Date,
+    stripeId: string,
+    amount: number,
+    plan: number,
+    credits: number,
+    buyer?: {
+        _id: string,
+        firstName: string,
+        lastName: string,
+    },
+    lastName?: String,
+}
+
+const TransactionSchema = new Schema({
+    createdAt: { type: Date,default: Date.now },
+    stripeId: { type: String, required: true, unique: true },
+    amount: { type: Number, required: true },
+    plan: { type: String },
+    credits : { type: Number },
+    buyer : { type: Schema.Types.ObjectId, ref:"User" },
+})
+
+const Transaction = models?.Transaction || model('Transaction', TransactionSchema);
+
+export default Transaction;
