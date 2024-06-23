@@ -6,7 +6,7 @@ import { NextResponse } from 'next/server';
 import { createUser, deleteUser, updateUser } from '@/lib/actions/user.actions';
 
 export async function POST(req: Request) {
-
+    console.log("I'm inside the POST function");
     // You can find this in the Clerk Dashboard -> Webhooks -> choose the endpoint
     const WEBHOOK_SECRET = process.env.WEBHOOK_SECRET
 
@@ -58,7 +58,8 @@ export async function POST(req: Request) {
     // Create
     if (eventType === "user.created") {
         const { id, email_addresses, image_url, first_name, last_name, username } = evt.data;
-
+        console.log("I'm inside the POST function and creating user", evt.data);
+        
         const user: CreateUserParams = {
             clerkId: id!,
             email: email_addresses[0].email_address!,
@@ -67,7 +68,7 @@ export async function POST(req: Request) {
             lastName: last_name!,
             photo: image_url,
         }
-
+        
         const newUser = await createUser(user);
         if (newUser) {
             await clerkClient.users.updateUserMetadata(id, {
@@ -78,11 +79,11 @@ export async function POST(req: Request) {
         }
         return NextResponse.json({ message: 'OK', user: newUser });
     }
-
+    
     // Update
     if (eventType === 'user.updated') {
         const { id, image_url, first_name, last_name, username } = evt.data;
-
+        console.log("I'm inside the POST function and updating user", evt.data);
         const user: UpdateUserParams = {
             firstName: first_name!,
             lastName: last_name!,
@@ -92,10 +93,11 @@ export async function POST(req: Request) {
         const updatedUser = await updateUser(id, user);
         return NextResponse.json({ message: 'OK', user: updatedUser });
     }
-
+    
     // Delete
     if (eventType === "user.deleted") {
         const { id } = evt.data;
+        console.log("I'm inside the POST function and deleting user", evt.data);
         const deletedUser = await deleteUser(id!);
         return NextResponse.json({ message: "OK", user: deletedUser });
     }
